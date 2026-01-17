@@ -1,0 +1,55 @@
+# Global experiment configuration
+# Edit values to match local paths, hardware, and desired hyperparameters.
+
+# Paths
+paths:
+  raw_data_dir: "data/raw"            # directory that holds raw dataset files (csv/tsv/fasta)
+  processed_data_dir: "data/processed" # directory to store processed outputs (npz, tokenizers)
+  model_dir: "checkpoints"            # directory to save trained models and prototypes
+  logs_dir: "logs"                    # tensorboard / csv logs
+
+# Dataset settings
+dataset:
+  file_pattern: "*.csv"               # glob pattern to find data files
+  seq_col: "cdr3"                     # column name for CDR3 sequence
+  peptide_col: "peptide"              # column name for peptide / antigen (task id)
+  label_col: "label"                  # column name for label (0/1) when present
+  min_seq_len: 5
+  max_seq_len: 30
+  valid_aas: "ACDEFGHIKLMNPQRSTVWY"    # accepted amino-acids; others filtered
+
+# Task split / meta settings
+split:
+  seed: 42
+  pretrain_task_frac: 0.7             # fraction of tasks used for prototype/adpater pretraining (T_pre)
+  val_task_frac: 0.1                  # fraction for validation (from remaining)
+  test_task_frac: 0.2                 # fraction for held-out evaluation
+  min_examples_per_task: 5            # drop tasks with fewer examples
+
+# Model / retrieval hyperparameters (prototypes / sparse retrieval)
+model:
+  device: "cuda"                      # or "cpu"
+  pretrained_plm_name: "Rostlab/prot_bert" # used only as a reference
+  K_grid: [64, 128, 256]              # candidate prototype counts to try
+  adapter_rank: 32
+  lambda_prox: 1e-3
+  gamma_entropy: 1e-2
+  prototype_r: 64
+
+# Training
+training:
+  batch_size: 128
+  num_workers: 4
+  max_epochs: 50
+  lr: 1e-3
+  weight_decay: 1e-5
+
+# Bootstrap / diagnostics
+diagnostics:
+  bootstrap_iters: 1000
+  bootstrap_confidence: 0.9
+
+# Misc
+logging:
+  save_every_n_epochs: 1
+  verbose: true
